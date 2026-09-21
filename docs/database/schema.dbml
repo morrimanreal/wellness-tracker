@@ -1,0 +1,135 @@
+Table user_profile {
+  profile_id integer [primary key, increment]
+
+  current_weight decimal(5,2) [not null]
+  goal_weight decimal(5,2) [not null]
+  weight_unit varchar(10) [not null, default: 'lb']
+
+  maintenance_calories integer [not null]
+
+  daily_calorie_target integer [not null]
+  daily_protein_target decimal(6,2) [not null]
+  daily_carbs_target decimal(6,2) [not null]
+  daily_fat_target decimal(6,2) [not null]
+
+  goal_type varchar(20) [not null]
+} 
+
+Table categories {
+  category_id integer [primary key, increment]
+  name varchar(100) [not null, unique]
+}
+
+Table foods {
+  food_id integer [primary key, increment ]
+
+  name varchar(150) [not null]
+  category_id integer [not null]
+
+  preparation_state varchar(20) [not null, default: 'UNSPECIFIED']
+
+  calories_per_100g decimal(7,2) [not null]
+  protein_per_100g decimal(7,2) [not null]
+  carbs_per_100g decimal(7,2) [not null]
+  fat_per_100g decimal(7,2) [not null]
+}
+
+Table locations {
+  location_id integer [primary key, increment]
+  name varchar(100) [not null, unique]
+}
+
+Table inventory {
+  inventory_id integer [primary key, increment]
+
+  food_id integer [not null]
+  location_id integer [not null]
+
+  quantity decimal(10,2) [not null]
+  unit varchar(20) [not null]
+
+  purchase_date date
+  expiration_date date
+}
+
+Table food_log {
+  food_log_id integer [primary key, increment]
+
+  food_id integer [not null]
+
+  amount_consumed decimal(10,2) [not null]
+  unit varchar(20) [not null]
+
+  meal_type varchar(30)
+  consumed_at timestamp [not null]
+}
+
+Table outside_food_log {
+  outside_food_log_id integer [primary key, increment]
+
+  entry_name varchar(150) [not null]
+
+  estimated_calories decimal(7,2) [not null]
+  estimated_protein decimal(7,2)
+  estimated_carbs decimal(7,2)
+  estimated_fat decimal(7,2)
+
+  meal_type varchar(30)
+  consumed_at timestamp [not null]
+  notes varchar(255)
+}
+
+Table shopping_list {
+  shopping_item_id integer [primary key, increment]
+
+  item_name varchar(150) [not null]
+
+  quantity decimal(10,2)
+  unit varchar(20)
+
+  purchased boolean [not null, default: false]
+
+  date_added timestamp [not null]
+}
+
+Table recipes {
+  recipe_id integer [primary key, increment]
+
+  name varchar(150) [not null]
+  description varchar(500)
+
+  servings integer [not null]
+}
+
+Table recipe_ingredients {
+  recipe_ingredient_id integer [primary key, increment]
+
+  recipe_id integer [not null]
+  food_id integer [not null]
+
+  amount decimal(10,2) [not null]
+  unit varchar(20) [not null]
+
+  indexes {
+    (recipe_id, food_id) [unique]
+  }
+}
+
+Table recipe_log {
+  recipe_log_id integer [primary key, increment]
+
+  recipe_id integer [not null]
+
+  servings_consumed decimal(6,2) [not null]
+
+  meal_type varchar(30)
+  consumed_at timestamp [not null]
+}
+
+Ref: categories.category_id < foods.category_id
+Ref: foods.food_id < inventory.food_id
+Ref: locations.location_id < inventory.location_id
+Ref: foods.food_id < food_log.food_id
+Ref: recipes.recipe_id < recipe_ingredients.recipe_id
+Ref: foods.food_id < recipe_ingredients.food_id
+Ref: recipes.recipe_id < recipe_log.recipe_id
