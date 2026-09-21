@@ -79,10 +79,20 @@ Table outside_food_log {
   notes varchar(255)
 }
 
-Table shopping_list {
-  shopping_item_id integer [primary key, increment]
+Table grocery_lists {
+  grocery_list_id integer [primary key, increment]
 
-  item_name varchar(150) [not null]
+  name varchar(150) [not null]
+
+  created_at timestamp [not null]
+}
+
+
+Table grocery_list_items {
+  grocery_item_id integer [primary key, increment]
+
+  grocery_list_id integer [not null]
+  food_id integer [not null]
 
   quantity decimal(10,2)
   unit varchar(20)
@@ -90,7 +100,12 @@ Table shopping_list {
   purchased boolean [not null, default: false]
 
   date_added timestamp [not null]
+
+  indexes {
+    (grocery_list_id, food_id) [unique]
+  }
 }
+
 
 Table recipes {
   recipe_id integer [primary key, increment]
@@ -130,6 +145,10 @@ Ref: categories.category_id < foods.category_id
 Ref: foods.food_id < inventory.food_id
 Ref: locations.location_id < inventory.location_id
 Ref: foods.food_id < food_log.food_id
+
+Ref: grocery_lists.grocery_list_id < grocery_list_items.grocery_list_id
+Ref: foods.food_id < grocery_list_items.food_id
+
 Ref: recipes.recipe_id < recipe_ingredients.recipe_id
 Ref: foods.food_id < recipe_ingredients.food_id
 Ref: recipes.recipe_id < recipe_log.recipe_id
